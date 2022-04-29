@@ -10,6 +10,7 @@ export interface GameGuide {
 
 export interface GuideInfo {
   difficulty: string;
+  difficultyVoteLink: string;
   duration: string;
   trophiesOffline: number,
   trophiesOnline: number,
@@ -21,7 +22,7 @@ export interface GuideInfo {
   difficultyTiedTrophies: string,
   cheatsAvailable: string,
   onlineRequired: string,
-  dlcRequired: boolean,
+  dlcRequired: string,
   dlcPrice: string,
   storePrice: string,
 }

@@ -9,9 +9,10 @@ export const ParseGuide = (bbguide: string) => {
   let summary = trophySummary(bbguide)
   let info = gameInfo(bbguide)
 
-  console.debug("game: %s", game);
-  console.debug("author: %s", author)
-  console.debug("trophysummary: %s", summary)
+  console.debug(game);
+  console.debug(author)
+  console.debug(summary)
+  console.debug(info)
 
 }
 
@@ -54,14 +55,35 @@ const trophySummary = (bb: string, sp: number = 0): TrophySummary => {
   }
 }
 
-const gameInfo = (bb: string, sp: number = 0): string => {
+const gameInfo = (bb: string, sp: number = 0): GuideInfo => {
   var keyword = "Información General"
   var ksp = bb.indexOf(`[SIZE=\\"4\\"]${keyword}`, sp)
-  var info = BBContent("LIST", bb, ksp)
-  info.split('[*]').forEach(i => {
-    if (i.length > 0) {
-      console.log(i);
-    }
-  })
-  return
+  var info = BBContent("LIST", bb, ksp).split('[*]')
+
+  // initial leap of faith implementation
+  if (info.length != 15) {
+    console.debug(
+      "Unexpected number of items in info array: got %d, want 15", info.length
+    );
+  }
+
+  return {
+    difficulty: rxCapture(info[1], /Dificultad.*B]\s([0-9]+).*/),
+    difficultyVoteLink: rxCapture(info[1], /Dificultad.*URL=\\"(.*)\\"]Vote.*\\n/).replaceAll('\\/', '/'),
+    duration: rxCapture(info[2], /Tiempo.*B]\s(.*)\\n/),
+    trophiesOffline: Number(rxCapture(info[3], /Offline.*B]\s([0-9]+)\\n/)),
+    trophiesOnline: Number(rxCapture(info[4], /Online.*B]\s([0-9]+)\\n/)),
+    trophiesMissable: Number(rxCapture(info[5], /Perdibles.*B]\s([0-9]+)\\n/)),
+    trophiesGlitched: Number(rxCapture(info[6], /Glitcheados.*B]\s([0-9]+)\\n/)),
+    gameRuns: Number(rxCapture(info[7], /Partidas Mínimas.*B]\s([0-9]+)\\n/)),
+    peripherals: rxCapture(info[8], /Periféricos.*B]\s(.*)\\n/).split(" "),
+    onlinePeopleRequired: Number(rxCapture(info[9], /Personas Necesarias.*B]\s([0-9]+)\\n/)),
+    difficultyTiedTrophies: rxCapture(info[10], /La Dificultad Afecta.*B]\s(.*)\\n/),
+    cheatsAvailable: rxCapture(info[11], /Trucos Disponibles.*B]\s(.*)\\n/),
+    onlineRequired: rxCapture(info[12], /Online Necesario.*B]\s(.*)\\n/),
+    dlcRequired: rxCapture(info[13], /Tiene DLC.*B]\s(.*)\\n/),
+    dlcPrice: rxCapture(info[13], /Tiene DLC.*B]\s(.*)\\n/),
+    storePrice: rxCapture(info[14], /Precio.*B]\s(.*)/),
+  }
+
 }
