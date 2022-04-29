@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "fs": "^0.0.1-security"
+  },
+  "scripts": {
+    "lint": "tslint --project tsconfig.json --format stylish",
+    "start": "node --trace-warnings dist/app.js",
+    "prestart": "npm run build",
+    "build": "tsc",
+    "local": "ts-node src/app.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^17.0.30"
+  }
+}
