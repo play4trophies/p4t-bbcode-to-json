@@ -4,8 +4,14 @@ export interface GameGuide {
   trophySummary: TrophySummary,
   info: GuideInfo,
   intro: string,
-  plan: string,
+  plan: GamePlanStep[],
   trophies: TrophyGuide[],
+}
+
+export interface GamePlanStep {
+  step: string,
+  description: string[],
+  substeps: GamePlanStep[],
 }
 
 export interface GuideInfo {
@@ -16,14 +22,14 @@ export interface GuideInfo {
   trophiesOnline: number,
   trophiesMissable: number,
   trophiesGlitched: number,
-  gameRuns: number,
+  gameRuns: string,
   peripherals: string[],
   onlinePeopleRequired: number,
   difficultyTiedTrophies: string,
   cheatsAvailable: string,
   onlineRequired: string,
   dlcRequired: string,
-  dlcPrice: string,
+  dlcRequiredList: string[],
   storePrice: string,
 }
 
