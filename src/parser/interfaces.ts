@@ -3,7 +3,7 @@ export interface GameGuide {
   author: string,
   trophySummary: TrophySummary,
   info: GuideInfo,
-  intro: string,
+  intro: string[],
   plan: GamePlanStep[],
   trophies: TrophyGuide[],
 }

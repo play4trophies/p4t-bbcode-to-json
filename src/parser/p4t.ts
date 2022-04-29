@@ -6,20 +6,18 @@ import {
 } from './interfaces'
 
 export const ParseGuide = (bbguide: string) => {
-  var gg: GameGuide;
 
-  let game = gameName(bbguide);
-  let author = authorName(bbguide)
-  let summary = trophySummary(bbguide)
-  let info = gameInfo(bbguide)
-  let plan = gamePlan(bbguide)
+  var gg: GameGuide = {
+    game: gameName(bbguide),
+    author: authorName(bbguide),
+    trophySummary: trophySummary(bbguide),
+    info: gameInfo(bbguide),
+    intro: gameIntro(bbguide),
+    plan: gamePlan(bbguide),
+    trophies: []
+  }
 
-  console.debug(game);
-  console.debug(author)
-  console.debug(summary)
-  console.debug(info)
-  console.debug(plan)
-
+  console.log(JSON.stringify(gg, null, 2));
 }
 
 const gameName = (bb: string, sp: number = 0): string => {
@@ -59,6 +57,16 @@ const trophySummary = (bb: string, sp: number = 0): TrophySummary => {
   return {
     total: t, gold: g, silver: s, bronze: b, platinum: p
   }
+}
+
+const gameIntro = (bb: string, sp: number = 0): string[] => {
+  var keyword = "Introducción"
+  var ksp = bb.indexOf(`[SIZE=\\"4\\"]${keyword}`, sp)
+  return BBContent("QUOTE", bb, ksp)
+    .replaceAll("[JUSTIFY]", "")
+    .replaceAll("[\\\\JUSTIFY]", "")
+    .split('\\n')
+    .filter(l => l)
 }
 
 const gameInfo = (bb: string, sp: number = 0): GuideInfo => {
