@@ -87,3 +87,11 @@ const gameInfo = (bb: string, sp: number = 0): GuideInfo => {
   }
 
 }
+
+
+const gamePlan = (bb: string, sp: number = 0): string => {
+  var keyword = "Plan de Trabajo"
+  var ksp = bb.indexOf(`[SIZE=\\"4\\"]${keyword}`, sp)
+  var plan = BBContent("QUOTE", bb, ksp).split('[*]')
+  return plan
+}
