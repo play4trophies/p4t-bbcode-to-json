@@ -3,6 +3,8 @@ export interface kv {
   value: string
 }
 
+const cleanBBCodeRegex = /(\[[\\]?\/?justify\]|\[\\?\/?center\]|\[\\?\/?quote\]|\[[\\]?\/?spoiler\])/ig
+
 export const BBContent = (bbid: string, bb: string, sp: number = 0): string => {
   // bb start
   var bbidsp = bb.indexOf(`[${bbid}]`, sp) || bb.indexOf(`[${bbid}=`, sp);
@@ -26,4 +28,21 @@ export const KeyValueFromBB = (bb: string, sp: number): kv => {
   //console.debug("value: %s (%s at %d/%d)", value, cb, cbob, cbcb)
 
   return { key: key, value: value }
+}
+
+export const BBCodeToMarkdown = (bb: string): string => {
+  return bb
+    .replaceAll(/[\\]+\//gm, "/")
+    .replaceAll(/\[URL=[\\]+"(?<url>https?:\/\/[^\s$.?#].[^\s]*)\\"\](?<name>[^\[]+)\[\/URL\]/igm, '[$<name>]($<url>)')
+    .replaceAll(/\[URL\](?<url>https?:\/\/[^\s$.?#].[^\s]*).*\[[\\]?\/URL\]/igm, '[link]($<url>)')
+    .replaceAll(/\[\\?\/?B\]/ig, "**")
+    .replaceAll(/\[COLOR=[\\]+"(?<color>[a-zA-Z]+)[\\]+"\](?<text>[^\[]+)\[\/COLOR\]/igm, "**$<text>**:")
+    .replaceAll(/\[SIZE=[\\]+"4[\\]+"](?<h1>[^\[]+)\[\/SIZE\]/igm, '# $<h1>')
+    .replaceAll(/\[SIZE=[\\]+"3[\\]+"](?<h2>[^\[]+)\[\/SIZE\]/igm, '## $<h2>')
+    .replaceAll(/\[[\\]?\/?list\]/igm, "\\n")
+    .replaceAll("&#8211;", "-")
+    .replaceAll("&#8220;", "\"")
+    .replaceAll("&#8221;", "\"")
+    .replaceAll(cleanBBCodeRegex, "")
+    .replaceAll("[*]", "- ")
 }

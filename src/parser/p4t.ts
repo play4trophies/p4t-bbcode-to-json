@@ -1,4 +1,4 @@
-import { kv, BBContent, KeyValueFromBB } from './bbcode'
+import { BBContent, BBCodeToMarkdown } from './bbcode'
 import {
   GameGuide, TrophySummary,
   GuideInfo, GamePlanStep,
@@ -33,6 +33,7 @@ const authorName = (bb: string): string => {
 }
 
 const rxCapture = (text: string, rx: RegExp): string => {
+  if (text == null) { return }
   let m = text.match(rx)
   //  console.debug(m)
   if (m == null) {
@@ -242,26 +243,15 @@ const gameTrophyStars = (t: string): number => {
 }
 
 
-const parseTrophyGuideBlock = (text: string): string[] => {
-  switch (text) {
+const parseTrophyGuideBlock = (tblock: string): string[] => {
+  switch (tblock) {
     case null:
       return []
     case "[Aquí explica de que manera es mas fácil conseguir dicho trofeo.]":
       return []
   }
 
-  return text
-    .replaceAll("[JUSTIFY]", "")
-    .replaceAll("[\\/JUSTIFY]", "")
-    .replaceAll("[spoiler]", "")
-    .replaceAll("[\\/spoiler]", "")
-    .replaceAll("[CENTER]", "")
-    .replaceAll("[\\/CENTER]", "")
-    .replaceAll("[LIST]", "")
-    .replaceAll("[\\/LIST]", "")
-    .replaceAll("[*]", "- ")
-    .replaceAll("[B]", "**")
-    .replaceAll("[/B]", "**")
+  return BBCodeToMarkdown(tblock)
     .split("\\n")
     .filter(l => l)
 
