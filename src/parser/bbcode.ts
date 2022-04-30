@@ -5,19 +5,22 @@ export interface kv {
 
 const cleanBBCodeRegex = /(\[[\\]?\/?justify\]|\[\\?\/?center\]|\[\\?\/?quote\]|\[[\\]?\/?spoiler\])/ig
 
-export const BBContent = (bbid: string, bb: string, sp: number = 0): string => {
+export const BBContent = (bbid: string, text: string): string => {
   // bb start
-  var bbidsp = bb.indexOf(`[${bbid}]`, sp)
-  if (bbidsp < 0) { bbidsp = bb.indexOf(`[${bbid}=`, sp) }
+  var bbidregex = new RegExp(`\\[${bbid}[\\]=]+`, "gmi")
+  var bbidsp = text.search(bbidregex)
+  //  console.log("%s(%d)", bbid, bbidsp)
   if (bbidsp < 0) {
-    console.debug("Unable to find %s bbcode block in %s.", bbid, bb)
-    return null
+    console.debug("Unable to find %s bbcode (%s) block in %s.",
+      bbid, bbidregex, text
+    )
+    return ""
   }
-  return KeyValueFromBB(bb, bbidsp).value
+  return KeyValueFromBB(text, bbidsp).value || ""
 }
 
 export const KeyValueFromBB = (bb: string, sp: number): kv => {
-  // key
+  // keys
   var obob = bb.indexOf("[", sp);
   var obcb = bb.indexOf("]", obob);
   var key = bb.slice(obob + 1, obcb);
@@ -35,7 +38,6 @@ export const KeyValueFromBB = (bb: string, sp: number): kv => {
 
 export const BBCodeToMarkdown = (bb: string): string => {
   return bb
-    .replaceAll(/[\\]+\//gm, "/")
     .replaceAll(/\[URL=[\\]+"(?<url>https?:\/\/[^\s$.?#].[^\s]*)\\"\](?<name>[^\[]+)\[\/URL\]/igm, '[$<name>]($<url>)')
     .replaceAll(/\[URL\](?<url>https?:\/\/[^\s$.?#].[^\s]*).*\[[\\]?\/URL\]/igm, '[link]($<url>)')
     .replaceAll(/\[\\?\/?B\]/ig, "**")

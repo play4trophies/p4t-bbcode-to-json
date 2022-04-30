@@ -29,27 +29,25 @@ export const ParseGuide = (p4t_guide: string): GameGuide => {
 const gameName = (bb: string, sp: number = 0): string => {
   var keyword = "Guía de Trofeos:"
   var ksp = bb.indexOf(`[B]${keyword}`, sp)
-  var text = BBContent("B", bb, ksp)
+  var text = BBContent("B", bb.slice(ksp))
   return text.replace(keyword, "").trim()
 }
 
 const authorName = (bb: string): string => {
-  return BBContent("MENTION", bb, 0)
+  return BBContent("MENTION", bb)
 }
 
 const rxCapture = (text: string, rx: RegExp): string => {
   if (text == null) { return null }
   let m = text.match(rx)
-  if (m == null) {
-    return
-  }
+  if (m == null) { return "" }
   return m[1]
 }
 
 const trophySummary = (bb: string, sp: number = 0): TrophySummary => {
   var keyword = ":grupotrofeos:"
   var ksp = bb.indexOf(`[B]${keyword}`, sp)
-  var text = BBContent("B", bb, ksp)
+  var text = BBContent("B", bb.slice(ksp))
   let t = Number(rxCapture(text, /:grupotrofeos:\n([0-9]+)/));
   let p = Number(rxCapture(text, /:platino:\s([0-9]+)/));
   let g = Number(rxCapture(text, /:oro:\s([0-9]+)/));
@@ -68,40 +66,39 @@ const trophySummary = (bb: string, sp: number = 0): TrophySummary => {
 const gameIntro = (bb: string, sp: number = 0): string[] => {
   var keyword = "Introducción"
   var ksp = bb.indexOf(`[SIZE="4"]${keyword}`, sp)
-  return BBCodeToMarkdown(BBContent("QUOTE", bb, ksp))
+  if (ksp < 0) ksp = bb.indexOf(`[SIZE=4]${keyword}`, sp)
+  //console.log(BBCodeToMarkdown(BBContent("QUOTE", bb.slice(ksp))))
+
+  return BBCodeToMarkdown(BBContent("QUOTE", bb.slice(ksp)))
     .split('\n')
     .filter(l => l)
 }
 
 const gameInfo = (bb: string, sp: number = 0): GuideInfo => {
   var keyword = "Información General"
-  var ksp = bb.indexOf(`[SIZE="4"]${keyword}`, sp)
-  var info = BBContent("LIST", bb, ksp).split('[*][B]')
 
-  // initial leap of faith implementation
-  if (info.length != 15) {
-    console.debug(
-      "Unexpected number of items in info array: got %d, want 15", info.length
-    );
-  }
+  var ksp = bb.indexOf(`[SIZE="4"]${keyword}`, sp)
+  if (ksp < 0) ksp = bb.indexOf(`[SIZE=4]${keyword}`, sp)
+
+  var info = BBContent("LIST", bb.slice(ksp)).split('[*][B]').filter(i => i)
 
   return {
-    difficulty: rxCapture(info[1], /Dificultad.*B]\s([0-9]+).*/),
-    difficultyVoteLink: rxCapture(info[1], /Dificultad.*URL="(.*)"]Vote.*\n/),
-    duration: rxCapture(info[2], /Tiempo.*B]\s(.*)\n/),
-    trophiesOffline: Number(rxCapture(info[3], /Offline.*B]\s([0-9]+)\n/)) || 0,
-    trophiesOnline: Number(rxCapture(info[4], /Online.*B]\s([0-9]+)\n/)) || 0,
-    trophiesMissable: Number(rxCapture(info[5], /Perdibles.*B]\s([0-9]+)\n/)) || 0,
-    trophiesGlitched: Number(rxCapture(info[6], /Glitcheados.*B]\s([0-9]+)\n/)) || 0,
-    gameRuns: rxCapture(info[7], /Partidas Mínimas.*B]\s(.*)\n/),
-    peripherals: rxCapture(info[8], /Periféricos.*B]\s(.*)\n/).split(" "),
-    onlinePeopleRequired: Number(rxCapture(info[9], /Personas Necesarias.*B]\s([0-9]+)\n/)),
-    difficultyTiedTrophies: rxCapture(info[10], /La Dificultad Afecta.*B]\s(.*)\n/),
-    cheatsAvailable: rxCapture(info[11], /Trucos Disponibles.*B]\s(.*)\n/),
-    onlineRequired: rxCapture(info[12], /Online Necesario.*B]\s(.*)\n/),
-    dlcRequired: rxCapture(info[13], /Tiene DLC.*B]\s([a-zA-Z0-9,\s]+).*\n/),
-    dlcRequiredList: parseListBlock(rxCapture(info[13], /Tiene DLC.*B]\s[a-zA-Z0-9,\s]+:\[[a-zA-Z]+\](.*)\[\/[a-zA-Z]+\]\n/)),
-    storePrice: rxCapture(info[14], /Precio.*B]\s(.*)/).replaceAll("&#8364;", "€"),
+    difficulty: (info.length > 0) ? rxCapture(info[0], /Dificultad.*B]\s([0-9]+).*/) : null,
+    difficultyVoteLink: (info.length > 0) ? rxCapture(info[0], /Dificultad.*URL="(.*)"]Vote.*\n/) : null,
+    duration: (info.length > 1) ? rxCapture(info[1], /Tiempo.*B]\s(.*)\n/) : null,
+    trophiesOffline: (info.length > 2) ? Number(rxCapture(info[2], /Offline.*B]\s([0-9]+)\n/) || 0) : 0,
+    trophiesOnline: (info.length > 3) ? Number(rxCapture(info[3], /Online.*B]\s([0-9]+)\n/) || 0) : 0,
+    trophiesMissable: (info.length > 4) ? Number(rxCapture(info[4], /Perdibles.*B]\s([0-9]+)\n/) || 0) : 0,
+    trophiesGlitched: (info.length > 5) ? Number(rxCapture(info[5], /Glitcheados.*B]\s([0-9]+)\n/) || 0) : 0,
+    gameRuns: (info.length > 6) ? rxCapture(info[6], /Partida.*B]\s(.*)\n/) : null,
+    peripherals: (info.length > 7) ? rxCapture(info[7], /Periféricos.*B]\s(.*)\n/).split(" ") : [],
+    onlinePeopleRequired: (info.length > 8) ? Number(rxCapture(info[8], /Personas Necesarias.*B]\s([0-9]+)\n/) || 0) : 0,
+    difficultyTiedTrophies: (info.length > 9) ? rxCapture(info[9], /La Dificultad Afecta.*B]\s(.*)\n/) : null,
+    cheatsAvailable: (info.length > 10) ? rxCapture(info[10], /Trucos Disponibles.*B]\s(.*)\n/) : null,
+    onlineRequired: (info.length > 11) ? rxCapture(info[11], /Online Necesario.*B]\s(.*)\n/) : null,
+    dlcRequired: (info.length > 12) ? rxCapture(info[12], /Tiene DLC.*B]\s([a-zA-Z0-9,\s]+).*\n/) : "No",
+    dlcRequiredList: (info.length > 12) ? parseListBlock(rxCapture(info[12], /Tiene DLC.*B]\s[a-zA-Z0-9,\s]+:\[[a-zA-Z]+\](.*)\[\/[a-zA-Z]+\]\n/)) : [],
+    storePrice: (info.length > 13) ? rxCapture(info[13], /Precio.*B]\s(.*)/).replaceAll("&#8364;", "€") : null,
   }
 
 }
@@ -120,18 +117,20 @@ const parseListBlock = (text: string): string[] => {
 const gamePlan = (bb: string, sp: number = 0): GamePlanStep[] => {
 
   var keyword = "Plan de Trabajo"
-  var ksp = bb.indexOf(`[SIZE="4"]${keyword}`, sp)
+  var kregex = new RegExp(`\\[SIZE=["]?4["]?\\]${keyword}`, "gmi")
+  var ksp = bb.slice(sp).search(kregex)
 
-  return BBContent("QUOTE", bb, ksp)
+  return
+  return BBContent("QUOTE", bb.slice(ksp))
     .replace("\n", "")
-    .split(`[SIZE="3"]`)
+    .split(/\[SIZE=["]?3["]?/igm)
     .filter(l => l)
     .map(
       (l): GamePlanStep => {
         var stepContent = l.split("[HR][/HR]")[1]
         if (stepContent.match(/\[B\][0-9].[0-9]/) == null) {
           return {
-            step: BBContent("B", l, 0),
+            step: BBContent("B", l),
             description: stepContent
               .replaceAll("[JUSTIFY]", "")
               .replaceAll("[/JUSTIFY]", "")
@@ -141,7 +140,7 @@ const gamePlan = (bb: string, sp: number = 0): GamePlanStep[] => {
           }
         }
         return {
-          step: BBContent("B", l, 0),
+          step: BBContent("B", l),
           description: stepContent.split("[B]")[0].split("\n").filter(l => l),
           substeps: stepContent
             .split("[B]")
