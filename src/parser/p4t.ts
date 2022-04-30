@@ -1,4 +1,4 @@
-import { BBContent, BBCodeToMarkdown } from './bbcode'
+import { BBContent, BBCodeToMarkdown, CleanBBCodeRegex } from './bbcode'
 import {
   GameGuide, TrophySummary,
   GuideInfo, GamePlanStep,
@@ -34,7 +34,32 @@ const gameName = (bb: string, sp: number = 0): string => {
 }
 
 const authorName = (bb: string): string => {
-  return BBContent("MENTION", bb)
+  let author = BBContent("MENTION", bb)
+  if (author != "") { return author }
+
+  var keyword = "Redactada por"
+  var ksp = bb.indexOf(keyword)
+  var author_content = BBContent("B", bb.slice(ksp))
+  author = rxCapture(author_content, /member\.php.*>(.*)<\/a>/)
+    .replaceAll(CleanBBCodeRegex, "")
+    .trim()
+
+  if (author != "") { return author }
+
+  author = BBContent("URL", author_content)
+    .replaceAll(CleanBBCodeRegex, "")
+    .trim()
+  if (author != "") { return author }
+
+  if (author_content != "") {
+    return author_content
+      .replaceAll(CleanBBCodeRegex, "")
+      .replaceAll(/\[\/?[^\]]+\]/g, "")
+      .trim()
+  }
+
+  console.log("Unable to locate author information: %s", author_content)
+  return null
 }
 
 const rxCapture = (text: string, rx: RegExp): string => {

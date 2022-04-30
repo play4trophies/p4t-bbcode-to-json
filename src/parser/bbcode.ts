@@ -3,16 +3,17 @@ export interface kv {
   value: string
 }
 
-const cleanBBCodeRegex = /(\[[\\]?\/?justify\]|\[\\?\/?center\]|\[\\?\/?quote\]|\[[\\]?\/?spoiler\])/ig
+export const CleanBBCodeRegex = /(\[[\\]?\/?justify\]|\[\\?\/?center\]|\[\\?\/?quote\]|\[[\\]?\/?spoiler\])/ig
 
 export const BBContent = (bbid: string, text: string): string => {
+  if (text == "") { return "" }
   // bb start
   var bbidregex = new RegExp(`\\[${bbid}[\\]=]+`, "gmi")
   var bbidsp = text.search(bbidregex)
   //  console.log("%s(%d)", bbid, bbidsp)
   if (bbidsp < 0) {
-    console.debug("Unable to find %s bbcode (%s) block in %s.",
-      bbid, bbidregex, text
+    console.debug("Unable to find %s bbcode (%s) block.",
+      bbid, bbidregex
     )
     return ""
   }
@@ -45,7 +46,7 @@ export const BBCodeToMarkdown = (bb: string): string => {
     .replaceAll(/\[SIZE=[\\]+"4[\\]+"](?<h1>[^\[]+)\[\/SIZE\]/igm, '# $<h1>')
     .replaceAll(/\[SIZE=[\\]+"3[\\]+"](?<h2>[^\[]+)\[\/SIZE\]/igm, '## $<h2>')
     .replaceAll(/\[[\\]?\/?list\]/igm, "\\n")
-    .replaceAll(cleanBBCodeRegex, "")
+    .replaceAll(CleanBBCodeRegex, "")
     .replaceAll("&#8211;", "-")
     .replaceAll("&#8220;", "\"")
     .replaceAll("&#8221;", "\"")
