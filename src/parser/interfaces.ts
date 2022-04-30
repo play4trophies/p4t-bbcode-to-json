@@ -45,14 +45,18 @@ export enum TrophyKind {
   Gold = "gold",
   Silver = "silver",
   Bronze = "bronze",
+  Platinum = "platinum",
 }
 
 export interface TrophyGuide {
-  id: number,
+  id: string,
+  image: string,
   name: string,
   kind: TrophyKind,
   difficulty: number,
+  hidden: boolean,
+  unobtainable: boolean,
   labels: string[],
-  description: string,
-  guide: string
+  description: string[],
+  guide: string[],
 }

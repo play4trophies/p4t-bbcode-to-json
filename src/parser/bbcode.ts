@@ -3,9 +3,9 @@ export interface kv {
   value: string
 }
 
-export const BBContent = (bbid: string, bb: string, sp: number): string => {
+export const BBContent = (bbid: string, bb: string, sp: number = 0): string => {
   // bb start
-  var bbidsp = bb.indexOf(`[${bbid}`, sp);
+  var bbidsp = bb.indexOf(`[${bbid}]`, sp) || bb.indexOf(`[${bbid}=`, sp);
   return KeyValueFromBB(bb, bbidsp).value
 }
 

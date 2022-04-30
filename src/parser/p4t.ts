@@ -14,10 +14,11 @@ export const ParseGuide = (bbguide: string) => {
     info: gameInfo(bbguide),
     intro: gameIntro(bbguide),
     plan: gamePlan(bbguide),
-    trophies: []
+    trophies: gameTrophies(bbguide)
   }
 
-  console.log(JSON.stringify(gg, null, 2));
+  //  console.log(JSON.stringify(gg, null, 2));
+  console.log(gg.trophies)
 }
 
 const gameName = (bb: string, sp: number = 0): string => {
@@ -152,4 +153,116 @@ const gamePlan = (bb: string, sp: number = 0): GamePlanStep[] => {
         }
       }
     )
+}
+
+// TODO
+const gameDLCs = (bb: string, sp: number = 0): string[] => {
+  /*
+  Batman Arkam
+  [CENTER][B][SIZE=4]DLC's[/SIZE][/B][/CENTER]
+  [QUOTE][CENTER][BOX3][URL=""][IMG]IMG[/IMG][CENTER][B][SIZE=1]NombreDLC[/SIZE][/B][/CENTER][/URL][/BOX3][/QUOTE]
+  */
+  return []
+}
+
+const gameTrophies = (bb: string, sp: number = 0): TrophyGuide[] => {
+  var keyword = "Guía de Trofeos"
+  var ksp = bb.indexOf(`[SIZE=\\"4\\"]${keyword}`, sp)
+  if (ksp < 0) { return [] }
+
+  var tlsp = bb.indexOf(`[ANAME=`, ksp)
+  var tlep = bb.indexOf(`[SIZE=\\"1\\"][CENTER][B][COLOR=\\"#FF0000\\"]Aviso Legal`, ksp)
+  if (tlep < 0) { tlep = bb.length }
+
+  let gt = bb
+    .substring(tlsp, tlep)
+    .replaceAll("[ANAME=", "##p4t-trophy-break##[ANAME=")
+    .split("##p4t-trophy-break##")
+    .filter(t => t)
+    .forEach((t): TrophyGuide => { return gameTrophyGuide(t) })
+  return []
+}
+
+const gameTrophyGuide = (t: string): TrophyGuide => {
+
+  //  console.log(t);
+
+  let trophyBBCODE = rxCapture(t, /\\\/ANAME]\[(BOX[A-Z]+)[0-9]?/)
+
+  let tg: TrophyGuide = {
+    id: BBContent("ANAME", t),
+    name: BBContent("B", t),
+    image: BBContent("IMG", t).replaceAll("\\", ""),
+    kind: gameTrophyKind(trophyBBCODE),
+    difficulty: gameTrophyStars(t),
+    hidden: BBContent("CENTER", t).search("oculto:") > 0,
+    unobtainable: BBContent("CENTER", t).search(":imposible:") > 0,
+    labels: [],
+    description: BBContent("BOXBRONCE", t)
+      .substring(BBContent("BOXBRONCE", t)
+        .search(`\\[SIZE=3\\]\\[B\\]${BBContent("B", BBContent("BOXBRONCE", t))}\\[\\\\\\\/B\\]\\[\\\\\/SIZE\\]`))
+      .replaceAll("[\\/INDENT]", "")
+      .replaceAll("<br>", "\n")
+      .split("\\n")
+      .filter(d => d)
+      .slice(1),
+    guide: parseTrophyGuideBlock(BBContent(`${trophyBBCODE}2`, t))
+  };
+
+  console.log(tg)
+  return tg
+}
+
+const gameTrophyKind = (btc: string): TrophyKind => {
+  switch (btc) {
+    case "BOXORO":
+      return TrophyKind.Gold
+    case "BOXPLATA":
+      return TrophyKind.Silver
+    case "BOXBRONCE":
+      return TrophyKind.Bronze
+    case "BOXBRONCE":
+      return TrophyKind.Bronze
+    case "BOXPLATINO":
+      return TrophyKind.Platinum
+  }
+  console.debug("Unable to find a matching TrophyKind for BoxCode: %s", btc)
+}
+
+const gameTrophyStars = (t: string): number => {
+  let starsDiff = BBContent("CENTER", t).match(/:([0-9.]+)estrellas?:/)
+  if (starsDiff != null) {
+    return Number(starsDiff[1]) || 0
+  }
+  if ((BBContent("CENTER", t).search(":imposible:")) > 0) {
+    return Infinity
+  }
+  console.debug("Unable to parse difficulty stars: %s", t)
+  return 0
+}
+
+
+const parseTrophyGuideBlock = (text: string): string[] => {
+  switch (text) {
+    case null:
+      return []
+    case "[Aquí explica de que manera es mas fácil conseguir dicho trofeo.]":
+      return []
+  }
+
+  return text
+    .replaceAll("[JUSTIFY]", "")
+    .replaceAll("[\\/JUSTIFY]", "")
+    .replaceAll("[spoiler]", "")
+    .replaceAll("[\\/spoiler]", "")
+    .replaceAll("[CENTER]", "")
+    .replaceAll("[\\/CENTER]", "")
+    .replaceAll("[LIST]", "")
+    .replaceAll("[\\/LIST]", "")
+    .replaceAll("[*]", "- ")
+    .replaceAll("[B]", "**")
+    .replaceAll("[/B]", "**")
+    .split("\\n")
+    .filter(l => l)
+
 }
