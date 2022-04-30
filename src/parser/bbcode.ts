@@ -40,9 +40,10 @@ export const BBCodeToMarkdown = (bb: string): string => {
     .replaceAll(/\[SIZE=[\\]+"4[\\]+"](?<h1>[^\[]+)\[\/SIZE\]/igm, '# $<h1>')
     .replaceAll(/\[SIZE=[\\]+"3[\\]+"](?<h2>[^\[]+)\[\/SIZE\]/igm, '## $<h2>')
     .replaceAll(/\[[\\]?\/?list\]/igm, "\\n")
+    .replaceAll(cleanBBCodeRegex, "")
     .replaceAll("&#8211;", "-")
     .replaceAll("&#8220;", "\"")
     .replaceAll("&#8221;", "\"")
-    .replaceAll(cleanBBCodeRegex, "")
+    .replaceAll(/\*\*(?<h>[#]+)\s/gmi, "$<h> **")
     .replaceAll("[*]", "- ")
 }
