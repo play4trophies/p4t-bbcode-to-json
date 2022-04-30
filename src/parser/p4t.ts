@@ -22,7 +22,7 @@ export const ParseGuide = (p4t_guide: string): GameGuide => {
     trophies: gameTrophies(p4t_guide)
   }
 
-  console.log(JSON.stringify(gg, null, 2));
+  //console.log(JSON.stringify(gg, null, 2));
   return gg
 }
 
@@ -50,7 +50,7 @@ const trophySummary = (bb: string, sp: number = 0): TrophySummary => {
   var keyword = ":grupotrofeos:"
   var ksp = bb.indexOf(`[B]${keyword}`, sp)
   var text = BBContent("B", bb, ksp)
-  let t = Number(rxCapture(text, /:grupotrofeos:\\n([0-9]+)/));
+  let t = Number(rxCapture(text, /:grupotrofeos:\n([0-9]+)/));
   let p = Number(rxCapture(text, /:platino:\s([0-9]+)/));
   let g = Number(rxCapture(text, /:oro:\s([0-9]+)/));
   let s = Number(rxCapture(text, /:plata:\s([0-9]+)/));
@@ -67,17 +67,17 @@ const trophySummary = (bb: string, sp: number = 0): TrophySummary => {
 
 const gameIntro = (bb: string, sp: number = 0): string[] => {
   var keyword = "Introducción"
-  var ksp = bb.indexOf(`[SIZE=\\"4\\"]${keyword}`, sp)
+  var ksp = bb.indexOf(`[SIZE="4"]${keyword}`, sp)
   return BBCodeToMarkdown(BBContent("QUOTE", bb, ksp))
-    .split('\\n')
+    .split('\n')
     .filter(l => l)
 }
 
 const gameInfo = (bb: string, sp: number = 0): GuideInfo => {
   var keyword = "Información General"
-  var ksp = bb.indexOf(`[SIZE=\\"4\\"]${keyword}`, sp)
+  var ksp = bb.indexOf(`[SIZE="4"]${keyword}`, sp)
   var info = BBContent("LIST", bb, ksp).split('[*][B]')
-  //  console.log(info)
+
   // initial leap of faith implementation
   if (info.length != 15) {
     console.debug(
@@ -87,20 +87,20 @@ const gameInfo = (bb: string, sp: number = 0): GuideInfo => {
 
   return {
     difficulty: rxCapture(info[1], /Dificultad.*B]\s([0-9]+).*/),
-    difficultyVoteLink: rxCapture(info[1], /Dificultad.*URL=\\"(.*)\\"]Vote.*\\n/).replaceAll('\\/', '/'),
-    duration: rxCapture(info[2], /Tiempo.*B]\s(.*)\\n/),
-    trophiesOffline: Number(rxCapture(info[3], /Offline.*B]\s([0-9]+)\\n/)) || 0,
-    trophiesOnline: Number(rxCapture(info[4], /Online.*B]\s([0-9]+)\\n/)) || 0,
-    trophiesMissable: Number(rxCapture(info[5], /Perdibles.*B]\s([0-9]+)\\n/)) || 0,
-    trophiesGlitched: Number(rxCapture(info[6], /Glitcheados.*B]\s([0-9]+)\\n/)) || 0,
-    gameRuns: rxCapture(info[7], /Partidas Mínimas.*B]\s(.*)\\n/),
-    peripherals: rxCapture(info[8], /Periféricos.*B]\s(.*)\\n/).split(" "),
-    onlinePeopleRequired: Number(rxCapture(info[9], /Personas Necesarias.*B]\s([0-9]+)\\n/)),
-    difficultyTiedTrophies: rxCapture(info[10], /La Dificultad Afecta.*B]\s(.*)\\n/),
-    cheatsAvailable: rxCapture(info[11], /Trucos Disponibles.*B]\s(.*)\\n/),
-    onlineRequired: rxCapture(info[12], /Online Necesario.*B]\s(.*)\\n/),
-    dlcRequired: rxCapture(info[13], /Tiene DLC.*B]\s([a-zA-Z0-9,\s]+).*\\n/),
-    dlcRequiredList: parseListBlock(rxCapture(info[13], /Tiene DLC.*B]\s[a-zA-Z0-9,\s]+:\[[a-zA-Z]+\](.*)\[\\\/[a-zA-Z]+\]\\n/)),
+    difficultyVoteLink: rxCapture(info[1], /Dificultad.*URL="(.*)"]Vote.*\n/),
+    duration: rxCapture(info[2], /Tiempo.*B]\s(.*)\n/),
+    trophiesOffline: Number(rxCapture(info[3], /Offline.*B]\s([0-9]+)\n/)) || 0,
+    trophiesOnline: Number(rxCapture(info[4], /Online.*B]\s([0-9]+)\n/)) || 0,
+    trophiesMissable: Number(rxCapture(info[5], /Perdibles.*B]\s([0-9]+)\n/)) || 0,
+    trophiesGlitched: Number(rxCapture(info[6], /Glitcheados.*B]\s([0-9]+)\n/)) || 0,
+    gameRuns: rxCapture(info[7], /Partidas Mínimas.*B]\s(.*)\n/),
+    peripherals: rxCapture(info[8], /Periféricos.*B]\s(.*)\n/).split(" "),
+    onlinePeopleRequired: Number(rxCapture(info[9], /Personas Necesarias.*B]\s([0-9]+)\n/)),
+    difficultyTiedTrophies: rxCapture(info[10], /La Dificultad Afecta.*B]\s(.*)\n/),
+    cheatsAvailable: rxCapture(info[11], /Trucos Disponibles.*B]\s(.*)\n/),
+    onlineRequired: rxCapture(info[12], /Online Necesario.*B]\s(.*)\n/),
+    dlcRequired: rxCapture(info[13], /Tiene DLC.*B]\s([a-zA-Z0-9,\s]+).*\n/),
+    dlcRequiredList: parseListBlock(rxCapture(info[13], /Tiene DLC.*B]\s[a-zA-Z0-9,\s]+:\[[a-zA-Z]+\](.*)\[\/[a-zA-Z]+\]\n/)),
     storePrice: rxCapture(info[14], /Precio.*B]\s(.*)/).replaceAll("&#8364;", "€"),
   }
 
@@ -111,44 +111,46 @@ const parseListBlock = (text: string): string[] => {
     return []
   }
   return text
-    .replaceAll("\\n", "")
+    .replaceAll("\n", "")
     .replaceAll("&#8364;", "€")
     .split("[*]")
     .filter(l => l)
 }
 
 const gamePlan = (bb: string, sp: number = 0): GamePlanStep[] => {
+
   var keyword = "Plan de Trabajo"
-  var ksp = bb.indexOf(`[SIZE=\\"4\\"]${keyword}`, sp)
+  var ksp = bb.indexOf(`[SIZE="4"]${keyword}`, sp)
+
   return BBContent("QUOTE", bb, ksp)
-    .replace("\\n", "")
-    .split("[SIZE=\\\"3\\\"]")
+    .replace("\n", "")
+    .split(`[SIZE="3"]`)
     .filter(l => l)
     .map(
       (l): GamePlanStep => {
-        var stepContent = l.split("[HR][\\\/HR]")[1]
+        var stepContent = l.split("[HR][/HR]")[1]
         if (stepContent.match(/\[B\][0-9].[0-9]/) == null) {
           return {
             step: BBContent("B", l, 0),
             description: stepContent
               .replaceAll("[JUSTIFY]", "")
-              .replaceAll("[\\/JUSTIFY]", "")
-              .split("\\n")
+              .replaceAll("[/JUSTIFY]", "")
+              .split("\n")
               .filter(d => d),
             substeps: [],
           }
         }
         return {
           step: BBContent("B", l, 0),
-          description: stepContent.split("[B]")[0].split("\\n").filter(l => l),
+          description: stepContent.split("[B]")[0].split("\n").filter(l => l),
           substeps: stepContent
             .split("[B]")
             .filter(ss => ss)
             .map(
               (ss): GamePlanStep => {
                 return {
-                  step: ss.split("[\\/B]")[0],
-                  description: ss.split("[\\/B]")[1].split("\\n").filter(l => l),
+                  step: ss.split("[/B]")[0],
+                  description: ss.split("[/B]")[1].split("\n").filter(l => l),
                   substeps: []
                 }
               }
@@ -170,49 +172,50 @@ const gameDLCs = (bb: string, sp: number = 0): string[] => {
 
 const gameTrophies = (bb: string, sp: number = 0): TrophyGuide[] => {
   var keyword = "Guía de Trofeos"
-  var ksp = bb.indexOf(`[SIZE=\\"4\\"]${keyword}`, sp)
+  var ksp = bb.indexOf(`[SIZE="4"]${keyword}`, sp)
   if (ksp < 0) { return [] }
 
   var tlsp = bb.indexOf(`[ANAME=`, ksp)
-  var tlep = bb.indexOf(`[SIZE=\\"1\\"][CENTER][B][COLOR=\\"#FF0000\\"]Aviso Legal`, ksp)
+  var tlep = bb.indexOf(`[SIZE="1"][CENTER][B][COLOR="#FF0000"]Aviso Legal`, ksp)
   if (tlep < 0) { tlep = bb.length }
 
-  let gt = bb
+  return bb
     .substring(tlsp, tlep)
     .replaceAll("[ANAME=", "##p4t-trophy-break##[ANAME=")
     .split("##p4t-trophy-break##")
     .filter(t => t)
-    .forEach((t): TrophyGuide => { return gameTrophyGuide(t) })
-  return []
+    .map((t): TrophyGuide => { return gameTrophyGuide(t) })
 }
 
 const gameTrophyGuide = (t: string): TrophyGuide => {
 
-  //console.log(t);
-
-  let trophyBBCODE = rxCapture(t, /\\\/ANAME]\[(BOX[A-Z]+)[0-9]?/)
+  let trophyBBCODE = rxCapture(t, /\/ANAME]\[(BOX[A-Z]+)[0-9]?/)
 
   let tg: TrophyGuide = {
     id: BBContent("ANAME", t),
     name: BBContent("B", t),
-    image: BBContent("IMG", t).replaceAll("\\", ""),
+    image: BBContent("IMG", t).replaceAll("", ""),
     kind: gameTrophyKind(trophyBBCODE),
     difficulty: gameTrophyStars(t),
     hidden: BBContent("CENTER", t).search("oculto:") > 0,
     unobtainable: BBContent("CENTER", t).search(":imposible:") > 0,
     labels: gameTrophyLabels(BBContent("INDENT", t)),
-    description: BBContent(trophyBBCODE, t)
-      .substring(BBContent(trophyBBCODE, t)
-        .search(`\\[SIZE=3\\]\\[B\\]${BBContent("B", BBContent(trophyBBCODE, t))}\\[\\\\\\\/B\\]\\[\\\\\/SIZE\\]`))
-      .replaceAll("[\\/INDENT]", "")
-      .replaceAll("<br>", "\n")
-      .split("\\n")
-      .filter(d => d)
-      .slice(1),
+    description: gameTrophyDescription(BBContent(trophyBBCODE, t)),
     guide: parseTrophyGuideBlock(BBContent(`${trophyBBCODE}2`, t))
   };
 
   return tg
+}
+
+const gameTrophyDescription = (t: string): string[] => {
+  return t
+    .substring(t
+      .indexOf(`[SIZE=3][B]${BBContent("B", t)}[/B][/SIZE]`))
+    .replaceAll("[/INDENT]", "")
+    .replaceAll("<br>", "\n")
+    .split("\n")
+    .filter(d => d)
+    .slice(1)
 }
 
 const gameTrophyKind = (btc: string): TrophyKind => {
@@ -252,7 +255,7 @@ const parseTrophyGuideBlock = (tblock: string): string[] => {
       return []
   }
   return BBCodeToMarkdown(tblock)
-    .split("\\n")
+    .split("\n")
     .filter(l => l)
 }
 
@@ -260,7 +263,7 @@ const gameTrophyLabels = (t: string): string[] => {
   return t
     .substring(
       t.indexOf("&#9675;") + "&#9675;".length,
-      t.indexOf("\\n[SIZE=3]")
+      t.indexOf("\n[SIZE=3]")
     )
     .replaceAll(":psn: o :ds2:", ":psn_or_ds2:")
     .replaceAll(":", "\n")
