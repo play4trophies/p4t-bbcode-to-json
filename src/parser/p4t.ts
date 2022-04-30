@@ -5,19 +5,25 @@ import {
   TrophyGuide, TrophyKind
 } from './interfaces'
 
-export const ParseGuide = (bbguide: string) => {
+export const ParseGuide = (p4t_guide: string): GameGuide => {
+
+  if (p4t_guide == undefined || p4t_guide == undefined) {
+    console.log("Guide text is empty")
+    return null
+  }
 
   var gg: GameGuide = {
-    game: gameName(bbguide),
-    author: authorName(bbguide),
-    trophySummary: trophySummary(bbguide),
-    info: gameInfo(bbguide),
-    intro: gameIntro(bbguide),
-    plan: gamePlan(bbguide),
-    trophies: gameTrophies(bbguide)
+    game: gameName(p4t_guide),
+    author: authorName(p4t_guide),
+    trophySummary: trophySummary(p4t_guide),
+    info: gameInfo(p4t_guide),
+    intro: gameIntro(p4t_guide),
+    plan: gamePlan(p4t_guide),
+    trophies: gameTrophies(p4t_guide)
   }
 
   console.log(JSON.stringify(gg, null, 2));
+  return gg
 }
 
 const gameName = (bb: string, sp: number = 0): string => {
@@ -71,7 +77,7 @@ const gameInfo = (bb: string, sp: number = 0): GuideInfo => {
   var keyword = "Información General"
   var ksp = bb.indexOf(`[SIZE=\\"4\\"]${keyword}`, sp)
   var info = BBContent("LIST", bb, ksp).split('[*][B]')
-
+  //  console.log(info)
   // initial leap of faith implementation
   if (info.length != 15) {
     console.debug(
