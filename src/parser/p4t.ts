@@ -198,7 +198,7 @@ const gameTrophyGuide = (t: string): TrophyGuide => {
     difficulty: gameTrophyStars(t),
     hidden: BBContent("CENTER", t).search("oculto:") > 0,
     unobtainable: BBContent("CENTER", t).search(":imposible:") > 0,
-    labels: [],
+    labels: gameTrophyLabels(BBContent("INDENT", t)),
     description: BBContent("BOXBRONCE", t)
       .substring(BBContent("BOXBRONCE", t)
         .search(`\\[SIZE=3\\]\\[B\\]${BBContent("B", BBContent("BOXBRONCE", t))}\\[\\\\\\\/B\\]\\[\\\\\/SIZE\\]`))
@@ -255,4 +255,16 @@ const parseTrophyGuideBlock = (tblock: string): string[] => {
     .split("\\n")
     .filter(l => l)
 
+}
+
+const gameTrophyLabels = (t: string): string[] => {
+  return t
+    .substring(
+      t.indexOf("&#9675;") + "&#9675;".length,
+      t.indexOf("\\n[SIZE=3]")
+    )
+    .replaceAll(":psn: o :ds2:", ":psn_or_ds2:")
+    .replaceAll(":", "\n")
+    .split("\n")
+    .filter(lt => lt)
 }
