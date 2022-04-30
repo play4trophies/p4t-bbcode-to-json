@@ -17,8 +17,7 @@ export const ParseGuide = (bbguide: string) => {
     trophies: gameTrophies(bbguide)
   }
 
-  //  console.log(JSON.stringify(gg, null, 2));
-  console.log(gg.trophies)
+  console.log(JSON.stringify(gg, null, 2));
 }
 
 const gameName = (bb: string, sp: number = 0): string => {
@@ -33,9 +32,8 @@ const authorName = (bb: string): string => {
 }
 
 const rxCapture = (text: string, rx: RegExp): string => {
-  if (text == null) { return }
+  if (text == null) { return null }
   let m = text.match(rx)
-  //  console.debug(m)
   if (m == null) {
     return
   }
@@ -64,9 +62,7 @@ const trophySummary = (bb: string, sp: number = 0): TrophySummary => {
 const gameIntro = (bb: string, sp: number = 0): string[] => {
   var keyword = "Introducción"
   var ksp = bb.indexOf(`[SIZE=\\"4\\"]${keyword}`, sp)
-  return BBContent("QUOTE", bb, ksp)
-    .replaceAll("[JUSTIFY]", "")
-    .replaceAll("[\\\\JUSTIFY]", "")
+  return BBCodeToMarkdown(BBContent("QUOTE", bb, ksp))
     .split('\\n')
     .filter(l => l)
 }
@@ -186,7 +182,7 @@ const gameTrophies = (bb: string, sp: number = 0): TrophyGuide[] => {
 
 const gameTrophyGuide = (t: string): TrophyGuide => {
 
-  //  console.log(t);
+  //console.log(t);
 
   let trophyBBCODE = rxCapture(t, /\\\/ANAME]\[(BOX[A-Z]+)[0-9]?/)
 
@@ -199,9 +195,9 @@ const gameTrophyGuide = (t: string): TrophyGuide => {
     hidden: BBContent("CENTER", t).search("oculto:") > 0,
     unobtainable: BBContent("CENTER", t).search(":imposible:") > 0,
     labels: gameTrophyLabels(BBContent("INDENT", t)),
-    description: BBContent("BOXBRONCE", t)
-      .substring(BBContent("BOXBRONCE", t)
-        .search(`\\[SIZE=3\\]\\[B\\]${BBContent("B", BBContent("BOXBRONCE", t))}\\[\\\\\\\/B\\]\\[\\\\\/SIZE\\]`))
+    description: BBContent(trophyBBCODE, t)
+      .substring(BBContent(trophyBBCODE, t)
+        .search(`\\[SIZE=3\\]\\[B\\]${BBContent("B", BBContent(trophyBBCODE, t))}\\[\\\\\\\/B\\]\\[\\\\\/SIZE\\]`))
       .replaceAll("[\\/INDENT]", "")
       .replaceAll("<br>", "\n")
       .split("\\n")
@@ -210,7 +206,6 @@ const gameTrophyGuide = (t: string): TrophyGuide => {
     guide: parseTrophyGuideBlock(BBContent(`${trophyBBCODE}2`, t))
   };
 
-  console.log(tg)
   return tg
 }
 
@@ -220,8 +215,6 @@ const gameTrophyKind = (btc: string): TrophyKind => {
       return TrophyKind.Gold
     case "BOXPLATA":
       return TrophyKind.Silver
-    case "BOXBRONCE":
-      return TrophyKind.Bronze
     case "BOXBRONCE":
       return TrophyKind.Bronze
     case "BOXPLATINO":
@@ -247,14 +240,14 @@ const parseTrophyGuideBlock = (tblock: string): string[] => {
   switch (tblock) {
     case null:
       return []
+    case undefined:
+      return []
     case "[Aquí explica de que manera es mas fácil conseguir dicho trofeo.]":
       return []
   }
-
   return BBCodeToMarkdown(tblock)
     .split("\\n")
     .filter(l => l)
-
 }
 
 const gameTrophyLabels = (t: string): string[] => {

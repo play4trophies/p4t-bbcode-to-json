@@ -7,7 +7,12 @@ const cleanBBCodeRegex = /(\[[\\]?\/?justify\]|\[\\?\/?center\]|\[\\?\/?quote\]|
 
 export const BBContent = (bbid: string, bb: string, sp: number = 0): string => {
   // bb start
-  var bbidsp = bb.indexOf(`[${bbid}]`, sp) || bb.indexOf(`[${bbid}=`, sp);
+  var bbidsp = bb.indexOf(`[${bbid}]`, sp)
+  if (bbidsp < 0) { bbidsp = bb.indexOf(`[${bbid}=`, sp) }
+  if (bbidsp < 0) {
+    console.debug("Unable to find %s bbcode block in %s.", bbid, bb)
+    return null
+  }
   return KeyValueFromBB(bb, bbidsp).value
 }
 
