@@ -5,16 +5,16 @@ export interface kv {
 
 export const CleanBBCodeRegex = /(\[[\\]?\/?justify\]|\[\\?\/?center\]|\[\\?\/?quote\]|\[[\\]?\/?spoiler\])/ig
 
-export const BBContent = (bbid: string, text: string): string => {
+export const BBContent = (bbid: string, text: string, ignore_miss: boolean = false): string => {
   if (text == "") { return "" }
   // bb start
   var bbidregex = new RegExp(`\\[${bbid}[\\]=]+`, "gmi")
   var bbidsp = text.search(bbidregex)
   //  console.log("%s(%d)", bbid, bbidsp)
   if (bbidsp < 0) {
-    console.debug("Unable to find %s bbcode (%s) block.",
-      bbid, bbidregex
-    )
+    if (!ignore_miss) {
+      console.warn("Unable to find %s bbcode (%s) block.", bbid, bbidregex)
+    }
     return ""
   }
   return KeyValueFromBB(text, bbidsp).value || ""
@@ -31,7 +31,7 @@ export const KeyValueFromBB = (bb: string, sp: number): kv => {
   var cb = `[\/${key.split("=")[0]}]`
   var cbob = bb.indexOf(cb, obcb);
   var cbcb = bb.indexOf(cb, cbob) + cb.length;
-  var value = bb.slice(obcb + 1, cbob)
+  var value = bb.slice(obcb + 1, cbob).replace(/[^ -~]+/g, "")
   //console.debug("value: %s (%s at %d/%d)", value, cb, cbob, cbcb)
 
   return { key: key, value: value }

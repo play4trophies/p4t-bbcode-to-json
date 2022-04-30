@@ -34,19 +34,19 @@ const gameName = (bb: string, sp: number = 0): string => {
 }
 
 const authorName = (bb: string): string => {
-  let author = BBContent("MENTION", bb)
+  let author = BBContent("MENTION", bb, true)
   if (author != "") { return author }
 
   var keyword = "Redactada por"
   var ksp = bb.indexOf(keyword)
-  var author_content = BBContent("B", bb.slice(ksp))
+  var author_content = BBContent("B", bb.slice(ksp), true)
   author = rxCapture(author_content, /member\.php.*>(.*)<\/a>/)
     .replaceAll(CleanBBCodeRegex, "")
     .trim()
 
   if (author != "") { return author }
 
-  author = BBContent("URL", author_content)
+  author = BBContent("URL", author_content, true)
     .replaceAll(CleanBBCodeRegex, "")
     .trim()
   if (author != "") { return author }
@@ -73,11 +73,11 @@ const trophySummary = (bb: string, sp: number = 0): TrophySummary => {
   var keyword = ":grupotrofeos:"
   var ksp = bb.indexOf(`[B]${keyword}`, sp)
   var text = BBContent("B", bb.slice(ksp))
-  let t = Number(rxCapture(text, /:grupotrofeos:\n([0-9]+)/));
-  let p = Number(rxCapture(text, /:platino:\s([0-9]+)/));
-  let g = Number(rxCapture(text, /:oro:\s([0-9]+)/));
-  let s = Number(rxCapture(text, /:plata:\s([0-9]+)/));
-  let b = Number(rxCapture(text, /:bronce:\s([0-9]+)/));
+  let t = Number(rxCapture(text, /:grupotrofeos:[\n\s]?([0-9]+)/m));
+  let p = Number(rxCapture(text, /:platino:\s([0-9]+)/m));
+  let g = Number(rxCapture(text, /:oro:\s([0-9]+)/m));
+  let s = Number(rxCapture(text, /:plata:\s([0-9]+)/m));
+  let b = Number(rxCapture(text, /:bronce:\s([0-9]+)/m));
   if (t != (p + g + s + b)) {
     console.log("Total trophies should match the sum: %d=%d+%d+%d+%d",
       t, p, g, s, b
@@ -225,7 +225,9 @@ const gameTrophyGuide = (t: string): TrophyGuide => {
     unobtainable: BBContent("CENTER", t).search(":imposible:") > 0,
     labels: gameTrophyLabels(BBContent("INDENT", t)),
     description: gameTrophyDescription(BBContent(trophyBBCODE, t)),
-    guide: parseTrophyGuideBlock(BBContent(`${trophyBBCODE}2`, t))
+    guide: parseTrophyGuideBlock(
+      BBContent(`${trophyBBCODE}2`, t, (trophyBBCODE == 'BOXPLATINO'))
+    )
   };
 
   return tg
