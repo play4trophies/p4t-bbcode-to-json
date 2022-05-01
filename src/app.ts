@@ -26,7 +26,7 @@ export interface P4TGameExport {
 class App {
   /** Entry point of our app */
   public static run() {
-    const gfile = readFileSync('examples/guias-single.json', 'utf8');
+    const gfile = readFileSync('examples/guias-subset.json', 'utf8');
     const gjson = JSON.parse(gfile);
 
     let guides: P4TGameExport[];
