@@ -73,7 +73,8 @@ const trophySummary = (bb: string, sp: number = 0): TrophySummary => {
   var keyword = ":grupotrofeos:"
   var ksp = bb.indexOf(`[B]${keyword}`, sp)
   var text = BBContent("B", bb.slice(ksp))
-  let t = Number(rxCapture(text, /:grupotrofeos:[\n\s]?([0-9]+)/m));
+
+  let t = Number(rxCapture(text, /:grupotrofeos:[\n\s]*([0-9]+)/m));
   let p = Number(rxCapture(text, /:platino:\s([0-9]+)/m));
   let g = Number(rxCapture(text, /:oro:\s([0-9]+)/m));
   let s = Number(rxCapture(text, /:plata:\s([0-9]+)/m));
@@ -144,7 +145,6 @@ const gamePlan = (bb: string, sp: number = 0): GamePlanStep[] => {
   var keyword = "Plan de Trabajo"
   var kregex = new RegExp(`\\[SIZE=["]?4["]?\\]${keyword}`, "gmi")
   var ksp = bb.slice(sp).search(kregex)
-
   return
   return BBContent("QUOTE", bb.slice(ksp))
     .replace("\n", "")

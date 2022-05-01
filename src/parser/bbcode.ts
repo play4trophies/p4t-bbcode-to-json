@@ -31,7 +31,8 @@ export const KeyValueFromBB = (bb: string, sp: number): kv => {
   var cb = `[\/${key.split("=")[0]}]`
   var cbob = bb.indexOf(cb, obcb);
   var cbcb = bb.indexOf(cb, cbob) + cb.length;
-  var value = bb.slice(obcb + 1, cbob).replace(/[^ -~]+/g, "")
+  var value = bb.slice(obcb + 1, cbob)
+  // .replaceAll("\r", "\n")
   //console.debug("value: %s (%s at %d/%d)", value, cb, cbob, cbcb)
 
   return { key: key, value: value }
