@@ -37,7 +37,9 @@ class App {
     }
     guides.forEach((g): GameGuide => {
       let gg = ParseGuide(g.guia_texto);
-      console.log(gg)
+      console.log(g.titulo)
+      //console.log(gg)
+      console.log(JSON.stringify(gg, null, 2))
       return gg
     })
   }
