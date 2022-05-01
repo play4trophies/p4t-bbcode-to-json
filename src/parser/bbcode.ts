@@ -55,4 +55,5 @@ export const BBCodeToMarkdown = (bb: string): string => {
     .replaceAll("&#8221;", "\"")
     .replaceAll(/\*\*(?<h>[#]+)\s/gmi, "$<h> **")
     .replaceAll("[*]", "- ")
+    .replaceAll("\r", "")
 }

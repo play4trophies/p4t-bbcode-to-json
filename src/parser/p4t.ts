@@ -275,14 +275,9 @@ const gameTrophyGuide = (t: string): TrophyGuide => {
 }
 
 const gameTrophyDescription = (t: string): string[] => {
-  return t
-    .substring(t
-      .indexOf(`[SIZE=3][B]${BBContent("B", t)}[/B][/SIZE]`))
-    .replaceAll("[/INDENT]", "")
-    .replaceAll("<br>", "\n")
-    .split("\n")
-    .filter(d => d)
-    .slice(1)
+  return BBCodeToMarkdown(
+    t.substring(t.indexOf(`[SIZE=3][B]${BBContent("B", t)}[/B][/SIZE]`))
+  ).split("\n").filter(d => d).slice(1)
 }
 
 const gameTrophyKind = (btc: string): TrophyKind => {
