@@ -90,10 +90,17 @@ const trophySummary = (bb: string, sp: number = 0): TrophySummary => {
 }
 
 const gameIntro = (bb: string, sp: number = 0): string[] => {
-  var keyword = "Introducción"
-  var ksp = bb.indexOf(`[SIZE="4"]${keyword}`, sp)
-  if (ksp < 0) ksp = bb.indexOf(`[SIZE=4]${keyword}`, sp)
-  //console.log(BBCodeToMarkdown(BBContent("QUOTE", bb.slice(ksp))))
+
+  let ksp = bb.slice(sp).search(/\[SIZE=\"?4\"?\]Introducción/)
+
+  // Look for the image if text based search fails
+  if (ksp < 0) { ksp = bb.indexOf("[IMG]http://i.imgur.com/hBslYnn.png[/IMG]", sp) }
+
+  if (ksp < 0) {
+    //console.log("%d: %s", ksp, bb.slice(sp).replaceAll("\n", "").substring(0, 4096))
+    console.warn('Unable to locate the game introduction section.',)
+    return
+  }
 
   return BBCodeToMarkdown(BBContent("QUOTE", bb.slice(ksp)))
     .split('\n')
@@ -101,10 +108,17 @@ const gameIntro = (bb: string, sp: number = 0): string[] => {
 }
 
 const gameInfo = (bb: string, sp: number = 0): GuideInfo => {
-  var keyword = "Información General"
 
-  var ksp = bb.indexOf(`[SIZE="4"]${keyword}`, sp)
-  if (ksp < 0) ksp = bb.indexOf(`[SIZE=4]${keyword}`, sp)
+  let ksp = bb.slice(sp).search(/\[SIZE=\"?4\"?\]Información General/)
+
+  // Look for the image if text based search fails
+  if (ksp < 0) { ksp = bb.indexOf("[IMG]http://i.imgur.com/dCSjmjy.png[/IMG]", sp) }
+
+  if (ksp < 0) {
+    //console.log("%d: %s", ksp, bb.slice(sp).replaceAll("\n", "").substring(0, 4096))
+    console.warn('Unable to locate the game info section.')
+    return
+  }
 
   var info = BBContent("LIST", bb.slice(ksp)).split('[*][B]').filter(i => i)
 
