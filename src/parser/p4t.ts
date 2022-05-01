@@ -169,7 +169,7 @@ const gamePlan = (bb: string, sp: number = 0): GamePlanStep[] => {
 
   return BBContent("QUOTE", bb.slice(ksp))
     .replace("\n", "")
-    .split(/\[SIZE=["]?3["]?/igm)
+    .split(/\[SIZE="?3"?/igm)
     .filter(l => l)
     .map(
       (l): GamePlanStep => {
@@ -177,9 +177,7 @@ const gamePlan = (bb: string, sp: number = 0): GamePlanStep[] => {
         if (stepContent.match(/\[B\][0-9].[0-9]/) == null) {
           return {
             step: BBContent("B", l),
-            description: stepContent
-              .replaceAll("[JUSTIFY]", "")
-              .replaceAll("[/JUSTIFY]", "")
+            description: BBCodeToMarkdown(stepContent)
               .split("\n")
               .filter(d => d),
             substeps: [],
