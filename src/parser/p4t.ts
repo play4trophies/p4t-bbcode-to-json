@@ -322,13 +322,35 @@ const parseTrophyGuideBlock = (tblock: string): string[] => {
 }
 
 const gameTrophyLabels = (t: string): string[] => {
-  return t
-    .substring(
-      t.indexOf("&#9675;") + "&#9675;".length,
-      t.indexOf("\n[SIZE=3]")
-    )
-    .replaceAll(":psn: o :ds2:", ":psn_or_ds2:")
-    .replaceAll(":", "\n")
-    .split("\n")
-    .filter(lt => lt)
+
+  let lb = t.substring(
+    t.indexOf("&#9675;") + "&#9675;".length,
+    t.indexOf("\n[SIZE=3]")
+  )
+
+  let labels = []
+  if (lb.indexOf(":reloj:") > 0) { labels.push("time") }
+  if (lb.indexOf(":online:") > 0) { labels.push("online") }
+  if (lb.indexOf(":psn:") > 0) { labels.push("online") }
+  if (lb.indexOf(":plus:") > 0) { labels.push("online") }
+  if (lb.indexOf(":historia:") > 0) { labels.push("story") }
+  if (lb.indexOf(":perdible:") > 0) { labels.push("missable") }
+  if (lb.indexOf(":glicheado:") > 0) { labels.push("gliched") }
+  if (lb.indexOf(":imposible:") > 0) { labels.push("impossible") }
+  if (lb.indexOf(":micro:") > 0) { labels.push("micro") }
+  if (lb.indexOf(":guitar:") > 0) { labels.push("guitar") }
+  if (lb.indexOf(":cable:") > 0) { labels.push("cable") }
+  if (lb.indexOf(":noboost:") > 0) { labels.push("noboost") }
+  if (lb.indexOf(":boost:") > 0) { labels.push("boost") }
+  if (lb.indexOf(":psvita:") > 0) { labels.push("psvita") }
+  if (lb.indexOf(":move:") > 0) { labels.push("move") }
+  if (lb.indexOf(":buzzer:") > 0) { labels.push("buzzer") }
+  if (lb.indexOf(":pendrive:") > 0) { labels.push("pendrive") }
+  if (lb.indexOf(":cam:") > 0) { labels.push("cam") }
+  if (lb.indexOf(":dsps4:") > 0) { labels.push("ds4") }
+  if (lb.indexOf(":ds1:") > 0) { labels.push("dsx1") }
+  if (lb.indexOf(":ds2:") > 0) { labels.push("dsx2") }
+  if (lb.indexOf(":ds3:") > 0) { labels.push("dsx3") }
+  if (lb.indexOf(":ds4:") > 0) { labels.push("dsx4") }
+  return labels
 }
