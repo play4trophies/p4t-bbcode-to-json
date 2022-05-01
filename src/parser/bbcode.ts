@@ -3,7 +3,7 @@ export interface kv {
   value: string
 }
 
-export const CleanBBCodeRegex = /(\[\/?justify\]|\[\/?center\]|\[\/?quote\]|\[\/?spoiler[^\]]*\])|\[\/?video\]/ig
+export const CleanBBCodeRegex = /(\[\/?justify\]|\[\/?indent\]|\[\/?center\]|\[\/?quote\]|\[\/?spoiler[^\]]*\])|\[\/?video\]/ig
 
 export const BBContent = (bbid: string, text: string, ignore_miss: boolean = false): string => {
   if (text == "") { return "" }
