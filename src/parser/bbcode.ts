@@ -42,6 +42,7 @@ export const BBCodeToMarkdown = (bb: string): string => {
   return bb
     .replaceAll(/\[URL="(?<url>https?:\/\/[^\s$.?#].[^\s]*)"\](?<name>[^\[]+)\[\/URL\]/igm, '[$<name>]($<url>)')
     .replaceAll(/\[URL\](?<url>https?:\/\/[^\s$.?#].[^\s]*).*\[\/URL\]/igm, '[link]($<url>)')
+    .replaceAll(/\[video=(?<platform>[^\;]+);(?<id>[^\[]+)\](?<url>https?:\/\/[^\s$.?#].[^\s]*)\[\/video\]/igm, '[$<platform>\/$<id>]($<url>)')
     .replaceAll(/\[B\](?<sp>[\s\n]*)(?<text>[^\[]+)[\s\n]*\[\/B\]/igm, "$<sp>**$<text>**:")
     .replaceAll(/\[COLOR="(?<color>[a-zA-Z]+)"\](?<text>[^\[]+)\[\/COLOR\]/igm, "**$<text>**:")
     .replaceAll(/\[SIZE="?4"?](?<h1>[^\[]+)\[\/SIZE\]/igm, '# $<h1>')
