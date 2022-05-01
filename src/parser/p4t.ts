@@ -205,9 +205,18 @@ const gamePlan = (bb: string, sp: number = 0): GamePlanStep[] => {
               )
           }
         }
+        if (l.indexOf("[B]") > 0) {
+          return {
+            step: BBContent("B", l),
+            description: BBCodeToMarkdown(l.slice(l.indexOf("\[\B\]")))
+              .split("\n")
+              .filter(d => d),
+            substeps: [],
+          }
+        }
         return {
-          step: BBContent("B", l),
-          description: BBCodeToMarkdown(l.slice(l.indexOf("\[\B\]")))
+          step: "General",
+          description: BBCodeToMarkdown(l)
             .split("\n")
             .filter(d => d),
           substeps: [],
