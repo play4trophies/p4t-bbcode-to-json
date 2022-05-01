@@ -168,36 +168,49 @@ const gamePlan = (bb: string, sp: number = 0): GamePlanStep[] => {
   }
 
   return BBContent("QUOTE", bb.slice(ksp))
-    .replace("\n", "")
+    .trim()
     .split(/\[SIZE="?3"?/igm)
     .filter(l => l)
     .map(
       (l): GamePlanStep => {
-        var stepContent = l.split("[HR][/HR]")[1]
-        if (stepContent.match(/\[B\][0-9].[0-9]/) == null) {
+        if (l.indexOf("[HR][/HR]") > 0) {
+          var stepContent = l.split("[HR][/HR]")[1]
+          if (stepContent.match(/\[B\][0-9].[0-9]/) == null) {
+            return {
+              step: BBContent("B", l),
+              description: BBCodeToMarkdown(stepContent)
+                .split("\n")
+                .filter(d => d),
+              substeps: [],
+            }
+          }
           return {
             step: BBContent("B", l),
-            description: BBCodeToMarkdown(stepContent)
+            description: BBCodeToMarkdown(stepContent.split("[B]")[0])
               .split("\n")
-              .filter(d => d),
-            substeps: [],
+              .filter(l => l),
+            substeps: stepContent
+              .split("[B]")
+              .filter(ss => ss)
+              .map(
+                (ss): GamePlanStep => {
+                  return {
+                    step: ss.split("[/B]")[0],
+                    description: BBCodeToMarkdown(ss.split("[/B]")[1])
+                      .split("\n")
+                      .filter(l => l),
+                    substeps: []
+                  }
+                }
+              )
           }
         }
         return {
           step: BBContent("B", l),
-          description: stepContent.split("[B]")[0].split("\n").filter(l => l),
-          substeps: stepContent
-            .split("[B]")
-            .filter(ss => ss)
-            .map(
-              (ss): GamePlanStep => {
-                return {
-                  step: ss.split("[/B]")[0],
-                  description: ss.split("[/B]")[1].split("\n").filter(l => l),
-                  substeps: []
-                }
-              }
-            )
+          description: BBCodeToMarkdown(l.slice(l.indexOf("\[\B\]")))
+            .split("\n")
+            .filter(d => d),
+          substeps: [],
         }
       }
     )
