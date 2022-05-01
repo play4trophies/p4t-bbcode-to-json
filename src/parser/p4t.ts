@@ -156,10 +156,17 @@ const parseListBlock = (text: string): string[] => {
 
 const gamePlan = (bb: string, sp: number = 0): GamePlanStep[] => {
 
-  var keyword = "Plan de Trabajo"
-  var kregex = new RegExp(`\\[SIZE=["]?4["]?\\]${keyword}`, "gmi")
-  var ksp = bb.slice(sp).search(kregex)
-  return
+  let ksp = bb.slice(sp).search(/\[SIZE=\"?4\"?\]Plan de Trabajo/)
+
+  // Look for the image if text based search fails
+  if (ksp < 0) { ksp = bb.indexOf("[IMG]http://i.imgur.com/OdFbBsq.png[/IMG]", sp) }
+
+  if (ksp < 0) {
+    //console.log("%d: %s", ksp, bb.slice(sp).replaceAll("\n", "").substring(0, 4096))
+    console.warn('Unable to locate the game plan section.',)
+    return
+  }
+
   return BBContent("QUOTE", bb.slice(ksp))
     .replace("\n", "")
     .split(/\[SIZE=["]?3["]?/igm)
