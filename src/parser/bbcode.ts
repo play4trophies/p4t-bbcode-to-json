@@ -40,12 +40,12 @@ export const KeyValueFromBB = (bb: string, sp: number): kv => {
 
 export const BBCodeToMarkdown = (bb: string): string => {
   return bb
-    .replaceAll(/\[URL=[\\]+"(?<url>https?:\/\/[^\s$.?#].[^\s]*)\\"\](?<name>[^\[]+)\[\/URL\]/igm, '[$<name>]($<url>)')
-    .replaceAll(/\[URL\](?<url>https?:\/\/[^\s$.?#].[^\s]*).*\[[\\]?\/URL\]/igm, '[link]($<url>)')
+    .replaceAll(/\[URL="(?<url>https?:\/\/[^\s$.?#].[^\s]*)"\](?<name>[^\[]+)\[\/URL\]/igm, '[$<name>]($<url>)')
+    .replaceAll(/\[URL\](?<url>https?:\/\/[^\s$.?#].[^\s]*).*\[\/URL\]/igm, '[link]($<url>)')
     .replaceAll(/\[\\?\/?B\]/ig, "**")
-    .replaceAll(/\[COLOR=[\\]+"(?<color>[a-zA-Z]+)[\\]+"\](?<text>[^\[]+)\[\/COLOR\]/igm, "**$<text>**:")
-    .replaceAll(/\[SIZE=[\\]+"4[\\]+"](?<h1>[^\[]+)\[\/SIZE\]/igm, '# $<h1>')
-    .replaceAll(/\[SIZE=[\\]+"3[\\]+"](?<h2>[^\[]+)\[\/SIZE\]/igm, '## $<h2>')
+    .replaceAll(/\[COLOR="(?<color>[a-zA-Z]+)"\](?<text>[^\[]+)\[\/COLOR\]/igm, "**$<text>**:")
+    .replaceAll(/\[SIZE="?4"?](?<h1>[^\[]+)\[\/SIZE\]/igm, '# $<h1>')
+    .replaceAll(/\[SIZE="?3"?](?<h2>[^\[]+)\[\/SIZE\]/igm, '## $<h2>')
     .replaceAll(/\[[\\]?\/?list\]/igm, "\\n")
     .replaceAll(CleanBBCodeRegex, "")
     .replaceAll("&#8211;", "-")
