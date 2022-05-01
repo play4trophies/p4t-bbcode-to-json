@@ -3,7 +3,7 @@ export interface kv {
   value: string
 }
 
-export const CleanBBCodeRegex = /(\[[\\]?\/?justify\]|\[\\?\/?center\]|\[\\?\/?quote\]|\[[\\]?\/?spoiler\])/ig
+export const CleanBBCodeRegex = /(\[\/?justify\]|\[\/?center\]|\[\/?quote\]|\[\/?spoiler[^\]]*\])/ig
 
 export const BBContent = (bbid: string, text: string, ignore_miss: boolean = false): string => {
   if (text == "") { return "" }
@@ -47,7 +47,7 @@ export const BBCodeToMarkdown = (bb: string): string => {
     .replaceAll(/\[COLOR="(?<color>[a-zA-Z]+)"\](?<text>[^\[]+)\[\/COLOR\]/igm, "**$<text>**:")
     .replaceAll(/\[SIZE="?4"?](?<h1>[^\[]+)\[\/SIZE\]/igm, '# $<h1>')
     .replaceAll(/\[SIZE="?3"?](?<h2>[^\[]+)\[\/SIZE\]/igm, '## $<h2>')
-    .replaceAll(/\[[\\]?\/?list\]/igm, "\n")
+    .replaceAll(/\[\/?list\]/igm, "\n")
     .replaceAll(CleanBBCodeRegex, "")
     .replaceAll("&#8211;", "-")
     .replaceAll("&#8220;", "\"")
